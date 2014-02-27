@@ -19,11 +19,18 @@ type pair struct {
 	Id   int    `json:"id"`
 }
 
+type hat struct {
+	Hat  int    `json:"hat"`
+	Name string `json:"name"`
+	Id   int    `json:"id"`
+}
+
 type joystickConfig struct {
 	Name    string `json:"name"`
 	Guid    string `json:"guid"`
 	Axis    []pair `json:"axis"`
 	Buttons []pair `json:"buttons"`
+	Hats    []hat  `json:"Hats"`
 }
 
 type JoystickInterface interface {
@@ -55,6 +62,9 @@ func NewJoystick(adaptor *JoystickAdaptor) *JoystickDriver {
 	for _, value := range d.config.Axis {
 		d.Events[value.Name] = make(chan interface{}, 0)
 	}
+	for _, value := range d.config.Hats {
+		d.Events[value.Name] = make(chan interface{}, 0)
+	}
 	return d
 }
 
@@ -82,6 +92,15 @@ func (me *JoystickDriver) Start() bool {
 							gobot.Publish(me.Events[button], data.State)
 						}
 					}
+				case *sdl.JoyHatEvent:
+					if data.Which == me.JoystickAdaptor.joystick.InstanceID() {
+						hat := me.findHatName(data.Value, data.Hat, me.config.Hats)
+						if hat == "" {
+							fmt.Println("Unknown Hat:", data.Hat, data.Value)
+						} else {
+							gobot.Publish(me.Events[hat], true)
+						}
+					}
 				}
 			}
 		}
@@ -92,6 +111,15 @@ func (me *JoystickDriver) Start() bool {
 func (me *JoystickDriver) findName(id uint8, list []pair) string {
 	for _, value := range list {
 		if int(id) == value.Id {
+			return value.Name
+		}
+	}
+	return ""
+}
+
+func (me *JoystickDriver) findHatName(id uint8, hat uint8, list []hat) string {
+	for _, value := range list {
+		if int(id) == value.Id && int(hat) == value.Hat {
 			return value.Name
 		}
 	}

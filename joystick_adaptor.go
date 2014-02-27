@@ -7,8 +7,7 @@ import (
 
 type JoystickAdaptor struct {
 	gobot.Adaptor
-	joystick   *sdl.Joystick
-	configFile string
+	joystick *sdl.Joystick
 }
 
 func (me *JoystickAdaptor) Connect() bool {
