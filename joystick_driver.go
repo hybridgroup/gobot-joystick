@@ -1,0 +1,99 @@
+package gobotJoystick
+
+import (
+	"encoding/json"
+	"fmt"
+	"github.com/hybridgroup/gobot"
+	"github.com/jackyb/go-sdl2/sdl"
+	"io/ioutil"
+)
+
+type JoystickDriver struct {
+	gobot.Driver
+	JoystickAdaptor *JoystickAdaptor
+	config          joystickConfig
+}
+
+type pair struct {
+	Name string `json:"name"`
+	Id   int    `json:"id"`
+}
+
+type joystickConfig struct {
+	Name    string `json:"name"`
+	Guid    string `json:"guid"`
+	Axis    []pair `json:"axis"`
+	Buttons []pair `json:"buttons"`
+}
+
+type JoystickInterface interface {
+}
+
+func NewJoystick(adaptor *JoystickAdaptor) *JoystickDriver {
+	d := new(JoystickDriver)
+	d.Events = make(map[string]chan interface{})
+	d.JoystickAdaptor = adaptor
+	d.Commands = []string{}
+
+	var configFile string
+	if value, ok := d.JoystickAdaptor.Params["config"]; ok {
+		configFile = value.(string)
+	} else {
+		panic("No joystick config specified")
+	}
+
+	file, e := ioutil.ReadFile(configFile)
+	if e != nil {
+		panic(fmt.Sprintf("File error: %v\n", e))
+	}
+	var jsontype joystickConfig
+	json.Unmarshal(file, &jsontype)
+	d.config = jsontype
+	for _, value := range d.config.Buttons {
+		d.Events[value.Name] = make(chan interface{}, 0)
+	}
+	for _, value := range d.config.Axis {
+		d.Events[value.Name] = make(chan interface{}, 0)
+	}
+	return d
+}
+
+func (me *JoystickDriver) Start() bool {
+	go func() {
+		var event sdl.Event
+		for {
+			for event = sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
+				switch data := event.(type) {
+				case *sdl.JoyAxisEvent:
+					if data.Which == me.JoystickAdaptor.joystick.InstanceID() {
+						axis := me.findName(data.Axis, me.config.Axis)
+						if axis == "" {
+							fmt.Println("Unknown Axis:", data.Axis)
+						} else {
+							gobot.Publish(me.Events[axis], data.Value)
+						}
+					}
+				case *sdl.JoyButtonEvent:
+					if data.Which == me.JoystickAdaptor.joystick.InstanceID() {
+						button := me.findName(data.Button, me.config.Buttons)
+						if button == "" {
+							fmt.Println("Unknown Button:", data.Button)
+						} else {
+							gobot.Publish(me.Events[button], data.State)
+						}
+					}
+				}
+			}
+		}
+	}()
+	return true
+}
+
+func (me *JoystickDriver) findName(id uint8, list []pair) string {
+	for _, value := range list {
+		if int(id) == value.Id {
+			return value.Name
+		}
+	}
+	return ""
+}
