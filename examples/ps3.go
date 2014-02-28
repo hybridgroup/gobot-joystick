@@ -17,11 +17,17 @@ func main() {
 	joystick.Name = "ps3"
 
 	work := func() {
-		gobot.On(joystick.Events["square"], func(data interface{}) {
-			fmt.Println("square", data)
+		gobot.On(joystick.Events["square_press"], func(data interface{}) {
+			fmt.Println("square_press")
 		})
-		gobot.On(joystick.Events["triangle"], func(data interface{}) {
-			fmt.Println("triangle", data)
+		gobot.On(joystick.Events["square_release"], func(data interface{}) {
+			fmt.Println("square_release")
+		})
+		gobot.On(joystick.Events["triangle_press"], func(data interface{}) {
+			fmt.Println("triangle_press")
+		})
+		gobot.On(joystick.Events["triangle_release"], func(data interface{}) {
+			fmt.Println("triangle_release")
 		})
 		gobot.On(joystick.Events["left_x"], func(data interface{}) {
 			fmt.Println("left_x", data)

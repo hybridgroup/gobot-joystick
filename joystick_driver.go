@@ -57,7 +57,8 @@ func NewJoystick(adaptor *JoystickAdaptor) *JoystickDriver {
 	json.Unmarshal(file, &jsontype)
 	d.config = jsontype
 	for _, value := range d.config.Buttons {
-		d.Events[value.Name] = make(chan interface{}, 0)
+		d.Events[fmt.Sprintf("%s_press", value.Name)] = make(chan interface{}, 0)
+		d.Events[fmt.Sprintf("%s_release", value.Name)] = make(chan interface{}, 0)
 	}
 	for _, value := range d.config.Axis {
 		d.Events[value.Name] = make(chan interface{}, 0)
@@ -89,7 +90,11 @@ func (me *JoystickDriver) Start() bool {
 						if button == "" {
 							fmt.Println("Unknown Button:", data.Button)
 						} else {
-							gobot.Publish(me.Events[button], data.State)
+							if data.State == 1 {
+								gobot.Publish(me.Events[fmt.Sprintf("%s_press", button)], nil)
+							} else {
+								gobot.Publish(me.Events[fmt.Sprintf("%s_release", button)], nil)
+							}
 						}
 					}
 				case *sdl.JoyHatEvent:
