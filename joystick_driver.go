@@ -6,6 +6,7 @@ import (
 	"github.com/hybridgroup/gobot"
 	"github.com/jackyb/go-sdl2/sdl"
 	"io/ioutil"
+	"time"
 )
 
 type JoystickDriver struct {
@@ -108,6 +109,7 @@ func (me *JoystickDriver) Start() bool {
 					}
 				}
 			}
+			time.Sleep(10 * time.Millisecond)
 		}
 	}()
 	return true
