@@ -112,6 +112,8 @@ func (me *JoystickDriver) Start() bool {
 	}()
 	return true
 }
+func (me *JoystickDriver) Init() bool { return true }
+func (me *JoystickDriver) Halt() bool { return true }
 
 func (me *JoystickDriver) findName(id uint8, list []pair) string {
 	for _, value := range list {
