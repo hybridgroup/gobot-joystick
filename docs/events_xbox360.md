@@ -132,9 +132,6 @@ Gets triggered every interval amount of time if the `right_stick_release` button
 
 Gets triggered every interval amount of time if the `left_stick_release` button is released.
 
-## start
-
-Starts the driver.
 
 
 

@@ -152,6 +152,3 @@ Gets triggered every interval amount of time if the `select_release` button is p
 
 Gets triggered every interval amount of time if the `home_release` button is pressed.
 
-## start
-
-Starts the driver.
