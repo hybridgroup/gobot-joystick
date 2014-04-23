@@ -1,8 +1,8 @@
 package gobotJoystick
 
 import (
+	"github.com/hybridgroup/go-sdl2/sdl"
 	"github.com/hybridgroup/gobot"
-	"github.com/jackyb/go-sdl2/sdl"
 )
 
 type JoystickAdaptor struct {
