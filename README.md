@@ -26,6 +26,8 @@ $ brew update
 $ brew install sdl2
 ```
 
+### Install gobot-joystick
+
 Now you can install `gobot-joystick` with
 ```
 $ go get github.com/hybridgroup/gobot-joystick
