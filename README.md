@@ -17,6 +17,17 @@ Installing gobot-joystick requires `sdl2` to be installed on your system
 $ sudo apt-get install libsdl2-2.0-0
 ```
 
+### OS X
+
+You can use [homebrew](http://brew.sh/) for this:
+
+```
+$ brew update
+$ brew install sdl2
+```
+
+### Install gobot-joystick
+
 Now you can install `gobot-joystick` with
 ```
 $ go get github.com/hybridgroup/gobot-joystick
